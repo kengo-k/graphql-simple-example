@@ -1,5 +1,4 @@
-import { ApolloServer, gql } from 'apollo-server-express'
-import express from 'express'
+import { ApolloServer, gql } from 'apollo-server'
 
 const typeDefs = gql`
   type Query {
@@ -13,18 +12,15 @@ const resolvers = {
   },
 }
 
-async function main() {
-  const apolloServer = new ApolloServer({ typeDefs, resolvers })
-  await apolloServer.start()
+function main() {
+  const server = new ApolloServer({
+    typeDefs,
+    resolvers,
+  })
 
-  const app = express()
-  apolloServer.applyMiddleware({ app })
-
-  app.listen({ port: 3000 }, () =>
-    console.log(
-      `🚀 Server ready at http://localhost:3000${apolloServer.graphqlPath}`
-    )
-  )
+  server.listen().then(({ url }) => {
+    console.log(`🚀  Server ready at ${url}`)
+  })
 }
 
 main()
