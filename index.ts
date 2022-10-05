@@ -68,15 +68,26 @@ const allTasks: Task[] = [
   },
 ]
 
-function main() {
+function init() {
   const server = new ApolloServer({
     typeDefs,
     resolvers,
   })
 
-  server.listen().then(({ url }) => {
-    console.log(`🚀  Server ready at ${url}`)
-  })
+  return {
+    start: async () => {
+      const { url } = await server.listen()
+      console.log(`🚀  Server ready at ${url}`)
+    },
+    stop: () => {
+      server.stop
+    },
+  }
+}
+
+async function main() {
+  const { start } = init()
+  start()
 }
 
 main()
