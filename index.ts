@@ -28,9 +28,21 @@ const typeDefs = gql`
   }
 
   type Query {
-    tasks: [Task]
+    all: [Task]
+    findByCategory(category: Int): [Task]
   }
 `
+
+const resolvers = {
+  Query: {
+    all: () => allTasks,
+    findByCategory: (_: any, args: any) => {
+      return allTasks.filter((task) => {
+        return task.category.id === args.category
+      })
+    },
+  },
+}
 
 const allTasks: Task[] = [
   {
@@ -55,12 +67,6 @@ const allTasks: Task[] = [
     done: false,
   },
 ]
-
-const resolvers = {
-  Query: {
-    tasks: () => allTasks,
-  },
-}
 
 function main() {
   const server = new ApolloServer({
