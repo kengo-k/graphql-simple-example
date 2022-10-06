@@ -41,6 +41,23 @@ test('all', async function () {
   })
 })
 
+test('find by category = 2', async function () {
+  const response = await axios.post('http://localhost:4000', {
+    query: `query {
+              findByCategory(category: 2) {
+                id
+              }
+            }`,
+  })
+  expect(response.data.data).toMatchObject({
+    findByCategory: [
+      {
+        id: '3',
+      },
+    ],
+  })
+})
+
 test('update task title', async function () {
   const response = await axios.post('http://localhost:4000', {
     query: `
