@@ -5,6 +5,12 @@
     "start": "ts-node index.ts",
     "test": "jest"
   },
+  "jest": {
+    "preset": "ts-jest",
+    "testMatch": [
+      "**/test/**/*.ts"
+    ]
+  },
   "dependencies": {
     "apollo-server": "^3.10.2",
     "graphql": "^16.6.0"
