@@ -13,6 +13,13 @@ interface Task {
   done: boolean
 }
 
+interface TaskCondition {
+  title: string
+  category: number
+  priority: number
+  done: boolean
+}
+
 const typeDefs = gql`
   type Category {
     id: ID
@@ -27,9 +34,20 @@ const typeDefs = gql`
     done: Boolean
   }
 
+  input TaskCondition {
+    title: String
+    category: ID
+    priority: Int
+    done: Boolean
+  }
+
   type Query {
     all: [Task]
     findByCategory(category: Int): [Task]
+  }
+
+  type Mutation {
+    updateTask(id: ID, task: TaskCondition): Task
   }
 `
 
@@ -40,6 +58,18 @@ const resolvers = {
       return allTasks.filter((task) => {
         return task.category.id === args.category
       })
+    },
+  },
+  Mutation: {
+    updateTask: (_: any, args: { id: string; task: TaskCondition }) => {
+      const target = allTasks.find((t) => `${t.id}` === args.id)
+      if (target) {
+        const newValue = args.task
+        if (newValue.title) {
+          target.title = newValue.title
+        }
+      }
+      return target
     },
   },
 }
