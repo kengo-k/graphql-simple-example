@@ -21,6 +21,21 @@ export const typeDefs = gql`
     done: Boolean
   }
 
+  type AddTaskResult {
+    task: Task
+    result: ResultCode
+  }
+
+  type Success {
+    newId: ID
+  }
+
+  type Error {
+    message: String
+  }
+
+  union ResultCode = Success | Error
+
   type Query {
     all: [Task]
     findByCategory(category: Int): [Task]
@@ -28,5 +43,6 @@ export const typeDefs = gql`
 
   type Mutation {
     updateTask(id: ID, task: TaskCondition): Task
+    addTask(task: TaskCondition): AddTaskResult
   }
 `

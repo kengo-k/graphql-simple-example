@@ -1,6 +1,16 @@
 import { Task, TaskCondition } from './types'
 
 export const resolvers = {
+  ResultCode: {
+    __resolveType(obj: any) {
+      if (obj.newId) {
+        return 'Success'
+      }
+      if (obj.message) {
+        return 'Error'
+      }
+    },
+  },
   Query: {
     all: () => allTasks,
     findByCategory: (_: any, args: any) => {
@@ -19,6 +29,9 @@ export const resolvers = {
         }
       }
       return target
+    },
+    addTask: (_: any, args: any) => {
+      return { task: null, result: { message: 'error ' } }
     },
   },
 }
