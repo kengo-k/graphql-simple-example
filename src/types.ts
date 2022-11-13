@@ -9,6 +9,7 @@ export interface Task {
   category: Category
   priority: number
   done: boolean
+  children: Task[]
 }
 
 export interface TaskCondition {

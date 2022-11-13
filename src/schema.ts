@@ -12,6 +12,7 @@ export const typeDefs = gql`
     category: Category
     priority: Int
     done: Boolean
+    children: [Task]
   }
 
   input TaskCondition {

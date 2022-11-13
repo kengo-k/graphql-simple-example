@@ -36,6 +36,23 @@ export const resolvers = {
   },
 }
 
+const task11: Task = {
+  id: 4,
+  title: 'title1-1',
+  category: { id: 2, name: 'category2' },
+  priority: 5,
+  done: false,
+  children: [],
+}
+const task12: Task = {
+  id: 5,
+  title: 'title1-2',
+  category: { id: 2, name: 'category2' },
+  priority: 5,
+  done: false,
+  children: [],
+}
+
 const allTasks: Task[] = [
   {
     id: 1,
@@ -43,6 +60,7 @@ const allTasks: Task[] = [
     category: { id: 1, name: 'category1' },
     priority: 10,
     done: false,
+    children: [task11, task12],
   },
   {
     id: 2,
@@ -50,6 +68,7 @@ const allTasks: Task[] = [
     category: { id: 1, name: 'category1' },
     priority: 7,
     done: false,
+    children: [],
   },
   {
     id: 3,
@@ -57,5 +76,6 @@ const allTasks: Task[] = [
     category: { id: 2, name: 'category2' },
     priority: 5,
     done: false,
+    children: [],
   },
 ]

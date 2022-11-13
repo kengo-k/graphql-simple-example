@@ -23,19 +23,46 @@ test('all', async function () {
         query {
           all {
             id
+            title
+            done
+            children {
+              id
+              title
+              done
+            }
           }
         }`,
   })
   expect(response.data.data).toMatchObject({
     all: [
       {
+        children: [
+          {
+            done: false,
+            id: '4',
+            title: 'title1-1',
+          },
+          {
+            done: false,
+            id: '5',
+            title: 'title1-2',
+          },
+        ],
+        done: false,
         id: '1',
+        title: 'title1',
       },
       {
+        children: [],
+        done: false,
         id: '2',
+        title: 'title2',
       },
       {
+        children: [],
+        done: false,
         id: '3',
+        title: 'title3',
       },
     ],
   })
