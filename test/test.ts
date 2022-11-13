@@ -20,15 +20,16 @@ test('1 + 1 = 2', function () {
 test('all', async function () {
   const response = await axios.post('http://localhost:4000', {
     query: `
+        fragment taskCommonProps on Task {
+          id
+          title
+          done
+        }
         query {
           all {
-            id
-            title
-            done
+            ...taskCommonProps
             children {
-              id
-              title
-              done
+              ...taskCommonProps
             }
           }
         }`,
