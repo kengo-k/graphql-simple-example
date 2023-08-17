@@ -11,7 +11,7 @@ export function init() {
   return {
     start: async () => {
       const { url } = await server.listen()
-      console.log(`🚀  Server ready at ${url}`)
+      console.log(`🚀 Server ready at ${url}`)
     },
     stop: async () => {
       await server.stop()

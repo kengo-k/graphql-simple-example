@@ -1,49 +1,49 @@
 import { gql } from 'apollo-server'
 
 export const typeDefs = gql`
-  type Category {
-    id: ID
-    name: String
+  type User {
+    id: ID!
+    name: String!
+    email: String!
+    tasks: [Task!]!
   }
 
   type Task {
-    id: ID
-    title: String
-    category: Category
-    priority: Int
-    done: Boolean
-    children: [Task]
+    id: ID!
+    title: String!
+    description: String
+    status: TaskStatus!
+    owner: User!
   }
 
-  input TaskCondition {
-    title: String
-    category: ID
-    priority: Int
-    done: Boolean
+  enum TaskStatus {
+    OPEN
+    INPROGRESS
+    DONE
   }
 
-  type AddTaskResult {
-    task: Task
-    result: ResultCode
+  union SearchResult = User | Task
+
+  input CreateUserInput {
+    name: String!
+    email: String!
   }
 
-  type Success {
-    newId: ID
+  input CreateTaskInput {
+    title: String!
+    description: String
+    status: TaskStatus!
+    ownerId: ID!
   }
-
-  type Error {
-    message: String
-  }
-
-  union ResultCode = Success | Error
 
   type Query {
-    all: [Task]
-    findByCategory(category: Int): [Task]
+    getUser(id: ID!): User
+    getTask(id: ID!): Task
+    search(keyword: String!): [SearchResult!]!
   }
 
   type Mutation {
-    updateTask(id: ID, task: TaskCondition): Task
-    addTask(task: TaskCondition): AddTaskResult
+    createUser(input: CreateUserInput!): User
+    createTask(input: CreateTaskInput!): Task
   }
 `
