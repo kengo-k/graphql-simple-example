@@ -36,14 +36,27 @@ export const typeDefs = gql`
     ownerId: ID!
   }
 
+  input UpdateUserInput {
+    name: String
+    email: String
+  }
+
+  input UpdateTaskInput {
+    title: String
+    description: String
+    status: TaskStatus
+  }
+
   type Query {
     getUser(id: ID!): User
     getTask(id: ID!): Task
-    search(keyword: String!): [SearchResult!]!
+    search(keyword: String): [SearchResult!]!
   }
 
   type Mutation {
     createUser(input: CreateUserInput!): User
     createTask(input: CreateTaskInput!): Task
+    updateUser(id: ID!, input: UpdateUserInput!): User
+    updateTask(id: ID!, input: UpdateTaskInput!): Task
   }
 `

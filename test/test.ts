@@ -13,144 +13,253 @@ afterAll(async () => {
   await stop()
 })
 
-test('1 + 1 = 2', function () {
-  expect(1 + 1).toBe(2)
+test('get task(id=1)', async function () {
+  const response = await axios.post('http://localhost:4000', {
+    query: `query ($taskId: ID!) {
+      getTask(id: $taskId) {
+        id
+        title
+        description
+        status
+      }
+    }`,
+    variables: {
+      taskId: '1',
+    },
+  })
+  expect(response.data.data).toMatchObject({
+    getTask: {
+      id: '1',
+      title: 'Buy groceries',
+      description: 'Milk, Bread, Eggs',
+      status: 'OPEN',
+    },
+  })
 })
 
-test('all', async function () {
+test('get task(id=1) with owner', async function () {
   const response = await axios.post('http://localhost:4000', {
-    query: `
-        fragment taskCommonProps on Task {
+    query: `query ($taskId: ID!) {
+      getTask(id: $taskId) {
+        id
+        title
+        description
+        status
+        owner {
+          id
+          name
+          email
+        }
+      }
+    }`,
+    variables: {
+      taskId: '1',
+    },
+  })
+  expect(response.data.data).toMatchObject({
+    getTask: {
+      id: '1',
+      title: 'Buy groceries',
+      description: 'Milk, Bread, Eggs',
+      status: 'OPEN',
+      owner: {
+        id: '1',
+        name: 'Alice Smith',
+        email: 'alice@example.com',
+      },
+    },
+  })
+})
+
+test('search(keyword=Bob)', async function () {
+  const response = await axios.post('http://localhost:4000', {
+    query: `query($keyword: String) {
+      search(keyword: $keyword) {
+        __typename
+        ... on User {
+          id
+          name
+          email
+        }
+        ... on Task {
           id
           title
-          done
+          description
+          status
+          owner {
+            id
+          }
         }
-        query {
-          all {
-            ...taskCommonProps
-            children {
-              ...taskCommonProps
-            }
-          }
-        }`,
-  })
-  expect(response.data.data).toMatchObject({
-    all: [
-      {
-        children: [
-          {
-            done: false,
-            id: '4',
-            title: 'title1-1',
-          },
-          {
-            done: false,
-            id: '5',
-            title: 'title1-2',
-          },
-        ],
-        done: false,
-        id: '1',
-        title: 'title1',
-      },
-      {
-        children: [],
-        done: false,
-        id: '2',
-        title: 'title2',
-      },
-      {
-        children: [],
-        done: false,
-        id: '3',
-        title: 'title3',
-      },
-    ],
-  })
-})
-
-test('find by category = 2', async function () {
-  const response = await axios.post('http://localhost:4000', {
-    query: `query {
-              findByCategory(category: 2) {
-                id
-              }
-            }`,
-  })
-  expect(response.data.data).toMatchObject({
-    findByCategory: [
-      {
-        id: '3',
-      },
-    ],
-  })
-})
-
-test('update task title', async function () {
-  const response = await axios.post('http://localhost:4000', {
-    query: `
-        mutation {
-          updateTask(id: 1, task: {title: "title999"}) {
-            id
-            title
-          }
-        }`,
-  })
-  expect(response.data.data).toMatchObject({
-    updateTask: {
-      id: '1',
-      title: 'title999',
-    },
-  })
-})
-
-test('update task title with varialbes', async function () {
-  const response = await axios.post('http://localhost:4000', {
-    query: `
-        mutation($id: ID, $task: TaskCondition) {
-          updateTask(id: $id, task: $task) {
-            id
-            title
-          }
-        }`,
+      }
+    }`,
     variables: {
-      id: 1,
-      task: {
-        title: 'title998',
-      },
+      keyword: 'Bob',
     },
   })
   expect(response.data.data).toMatchObject({
-    updateTask: {
-      id: '1',
-      title: 'title998',
-    },
+    search: [
+      {
+        __typename: 'Task',
+        id: '5',
+        title: 'Plan birthday party',
+        description: 'Organize a surprise party for Bob',
+        status: 'DONE',
+        owner: {
+          id: '3',
+        },
+      },
+      {
+        __typename: 'User',
+        id: '2',
+        name: 'Bob Johnson',
+        email: 'bob@example.com',
+      },
+    ],
   })
 })
 
-test('all(2nd)', async function () {
-  const response = await axios.post('http://localhost:4000', {
-    query: `
-        query {
-          all {
-            id
-            title
-          }
-        }`,
+test('a series of steps', async function () {
+  const createUserRes = await axios.post('http://localhost:4000', {
+    query: `mutation ($input: CreateUserInput!) {
+      createUser(input: $input) {
+        id
+        name
+        email
+      }
+    }`,
+    variables: {
+      input: {
+        name: 'David Thompson',
+        email: 'david@examplle.com',
+      },
+    },
   })
-  expect(response.data.data).toMatchObject({
-    all: [
+  expect(createUserRes.data.data).toMatchObject({
+    createUser: {
+      id: '4',
+      name: 'David Thompson',
+      email: 'david@examplle.com',
+    },
+  })
+
+  const updateUserRes = await axios.post('http://localhost:4000', {
+    query: `mutation($updateUserId: ID!, $input: UpdateUserInput!)  {
+      updateUser(id: $updateUserId, input: $input) {
+        id
+        name
+        email
+      }
+    }`,
+    variables: {
+      updateUserId: '4',
+      input: {
+        email: 'david@example.com',
+      },
+    },
+  })
+  expect(updateUserRes.data.data).toMatchObject({
+    updateUser: {
+      id: '4',
+      name: 'David Thompson',
+      email: 'david@example.com',
+    },
+  })
+
+  const createTaskRes = await axios.post('http://localhost:4000', {
+    query: `mutation($input: CreateTaskInput!)  {
+      createTask(input: $input) {
+        id
+        title
+        description
+        status
+        owner {
+          id
+        }
+      }
+    }`,
+    variables: {
+      input: {
+        description: 'Buy basic GraphQL books',
+        ownerId: '4',
+        status: 'OPEN',
+        title: 'Buy Books',
+      },
+    },
+  })
+  expect(createTaskRes.data.data).toMatchObject({
+    createTask: {
+      id: '7',
+      title: 'Buy Books',
+      description: 'Buy basic GraphQL books',
+      status: 'OPEN',
+      owner: {
+        id: '4',
+      },
+    },
+  })
+
+  const updateTaskRes = await axios.post('http://localhost:4000', {
+    query: `mutation UpdateTask($updateTaskId: ID!, $input: UpdateTaskInput!) {
+      updateTask(id: $updateTaskId, input: $input) {
+        id
+        title
+        description
+        status
+        owner {
+          id
+        }
+      }
+    }`,
+    variables: {
+      updateTaskId: '7',
+      input: {
+        status: 'DONE',
+      },
+    },
+  })
+  expect(updateTaskRes.data.data).toMatchObject({
+    updateTask: {
+      id: '7',
+      title: 'Buy Books',
+      description: 'Buy basic GraphQL books',
+      status: 'DONE',
+      owner: {
+        id: '4',
+      },
+    },
+  })
+
+  const searchRes = await axios.post('http://localhost:4000', {
+    query: `query($keyword: String) {
+      search(keyword: $keyword) {
+        ... on User {
+          id
+        }
+        ... on Task {
+          id
+          owner {
+            id
+          }
+        }
+      }
+    }`,
+    variables: {
+      keyword: 'Buy',
+    },
+  })
+  expect(searchRes.data.data).toMatchObject({
+    search: [
       {
         id: '1',
-        title: 'title998',
+        owner: {
+          id: '1',
+        },
       },
       {
-        id: '2',
-        title: 'title2',
-      },
-      {
-        id: '3',
-        title: 'title3',
+        id: '7',
+        owner: {
+          id: '4',
+        },
       },
     ],
   })
